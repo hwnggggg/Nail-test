@@ -100,7 +100,7 @@ def fetch_image_as_jpeg(path_or_url):
 b64 = lambda data: base64.b64encode(data).decode()
 
 # ─── 7. GPT prompt & call ─────────────────────────────────────────────────────
-openai.api_key = 
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 PROMPT = (
     "You are a professional nail technician recruiter. Given this nail job photo, "
