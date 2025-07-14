@@ -1,7 +1,6 @@
 # newst code, fix the format of output again
-# ─── 1. Install required packages ─────────────────────────────────────────────
-!pip install --quiet openai gspread gspread_dataframe pandas pillow pdf2image \
-    pillow-heif requests google-auth google-auth-oauthlib google-api-python-client
+# ─── 1. Install required packages - moved to requirements.txt ─────────────────
+
 
 # ─── 2. Imports ───────────────────────────────────────────────────────────────
 import os, io, json, base64, requests
