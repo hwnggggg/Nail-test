@@ -1,0 +1,43 @@
+name: Run Nail Review Script
+
+on:
+  schedule:
+    - cron: '0 * * * *'   #  Runs every hour
+  workflow_dispatch:       #  Manual trigger 
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Step 3: Install system packages for PDF + HEIF
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils libheif-dev
+
+      # Step 4: Install Python packages
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 5: Load secrets (OpenAI API Key + Google Credentials)
+      - name: Load API keys
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > credentials.json
+
+      # Step 6: Run the script
+      - name: Run nail review script
+        run: python main.py
