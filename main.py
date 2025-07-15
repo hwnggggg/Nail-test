@@ -17,14 +17,23 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 # ─── 3. Authenticate Google Drive / Sheets ────────────────────────────────────
-auth.authenticate_user()
-drive.mount("/content/drive")
-creds, _ = default(scopes=[
+# Save Google credentials (as string from secret) to a file
+SERVICE_ACCOUNT_FILE = "credentials.json"
+if not os.path.exists(SERVICE_ACCOUNT_FILE):
+    with open(SERVICE_ACCOUNT_FILE, "w") as f:
+        f.write(os.getenv("GOOGLE_CREDENTIALS_JSON"))
+
+SCOPES = [
     "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/spreadsheets",
-])
+    "https://www.googleapis.com/auth/spreadsheets"
+]
+creds = service_account.Credentials.from_service_account_file(
+    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+)
 gc = gspread.authorize(creds)
 drive_service = build("drive", "v3", credentials=creds)
+
+
 
 # ─── 4. Load target Sheet and detect "Photo" column ───────────────────────────
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1YXc2VOYnQqyawQSMbn0MW8lu3iZjDdDzR7q-PHo5sOA"
