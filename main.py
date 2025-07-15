@@ -32,7 +32,7 @@ creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES
 )
 gc = gspread.authorize(creds)
-_service = build("drive", "v3", credentials=creds)
+drive_service = build("drive", "v3", credentials=creds)
 
 
 
