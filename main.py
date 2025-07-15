@@ -12,6 +12,7 @@ from pdf2image import convert_from_bytes
 import gspread
 from google.colab import auth, drive
 from google.auth import default
+from google.oauth2 import service_account
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
