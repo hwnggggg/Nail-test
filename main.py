@@ -10,7 +10,7 @@ from PIL import Image, UnidentifiedImageError
 import pillow_heif; pillow_heif.register_heif_opener()
 from pdf2image import convert_from_bytes
 import gspread
-from google.colab import auth, drive
+
 from google.auth import default
 from google.oauth2 import service_account
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
@@ -32,7 +32,7 @@ creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES
 )
 gc = gspread.authorize(creds)
-drive_service = build("drive", "v3", credentials=creds)
+_service = build("", "v3", credentials=creds)
 
 
 
