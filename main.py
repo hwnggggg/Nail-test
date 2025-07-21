@@ -47,12 +47,9 @@ df = get_as_dataframe(worksheet).dropna(subset=["Photo"]).reset_index(drop=True)
 # ─── 4. Fetch Image Bytes ────────────────────────────────────────────────────
 def fetch_image_bytes(path_or_url):
     try:
-        # Skip local drive paths (not supported outside Colab)
         if path_or_url.startswith("/content/drive/"):
             print("Local Colab drive path not supported in GitHub Actions.")
             return None
-
-        # Handle Google Drive share URLs
         if "open?id=" in path_or_url:
             file_id = path_or_url.split("open?id=")[-1]
         elif "/file/d/" in path_or_url:
@@ -60,7 +57,6 @@ def fetch_image_bytes(path_or_url):
         else:
             raise ValueError("Unrecognized Photo entry")
 
-        # Download image from Google Drive
         request = drive_service.files().get_media(fileId=file_id)
         fh = BytesIO()
         downloader = MediaIoBaseDownload(fh, request)
@@ -69,16 +65,13 @@ def fetch_image_bytes(path_or_url):
             _, done = downloader.next_chunk()
         fh.seek(0)
 
-        # Open image in RGB format (now supports HEIC too)
         img = Image.open(fh).convert("RGB")
         buf = BytesIO(); img.save(buf, format="JPEG")
         return buf.getvalue()
-
     except Exception as e:
         print(f"Error loading image: {e}")
         return None
 
-# Helper function to base64-encode image bytes
 def encode_image_bytes(img_bytes):
     return base64.b64encode(img_bytes).decode("utf-8")
 
@@ -136,21 +129,17 @@ def get_nail_assessment(b64_img):
 results = []
 timestamp_col = "Timestamp Rating"
 
-# Ensure Timestamp Rating column exists
 if timestamp_col not in df.columns:
     df[timestamp_col] = ""
 
-# Get current Boston (EDT) time
 boston_now = lambda: datetime.now(pytz.timezone('America/New_York')).strftime("%Y-%m-%d %H:%M:%S")
 
 for idx, row in df.iterrows():
-    # Skip already rated rows
     if pd.notnull(row.get(timestamp_col)) and str(row[timestamp_col]).strip() != "":
         print(f"Skipping row {idx} — already rated.")
         results.append(None)
         continue
 
-    # Load and process image
     img_bytes = fetch_image_bytes(row["Photo"])
     if not img_bytes:
         print(f"Skipping row {idx}: could not load image.")
@@ -165,7 +154,6 @@ for idx, row in df.iterrows():
         })
         continue
 
-    # Assess via GPT
     try:
         assessment = get_nail_assessment(encode_image_bytes(img_bytes))
         assessment[timestamp_col] = boston_now()
