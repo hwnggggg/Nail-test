@@ -1,5 +1,4 @@
-# main.py code 
-# ─── 1. Install and imports tools ───────────────────────────────────────────────────────────────
+# ─── 1. Install and import tools ─────────────────────────────────────────────
 import os, io, json, base64, requests
 from datetime import datetime
 from pathlib import Path
@@ -13,18 +12,15 @@ from PIL import Image, UnidentifiedImageError
 from pdf2image import convert_from_bytes
 
 import gspread
-from google.colab import auth, drive
-from google.auth import default
 from google.oauth2 import service_account
-from gspread_dataframe import get_as_dataframe, set_with_dataframe
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
+from gspread_dataframe import get_as_dataframe, set_with_dataframe
 
 # Enable HEIF support
 pillow_heif.register_heif_opener()
 
-
-# ─── 2. Authenticate Google Drive / Sheets ────────────────────────────────────
+# ─── 2. Authenticate Google Drive / Sheets ───────────────────────────────────
 SERVICE_ACCOUNT_FILE = "credentials.json"
 if not os.path.exists(SERVICE_ACCOUNT_FILE):
     with open(SERVICE_ACCOUNT_FILE, "w") as f:
@@ -40,9 +36,9 @@ creds = service_account.Credentials.from_service_account_file(
 gc = gspread.authorize(creds)
 drive_service = build("drive", "v3", credentials=creds)
 
-# ─── 3. Load Sheet and Detect Image Column ────────────────────────────────────
+# ─── 3. Load Sheet and Detect Image Column ───────────────────────────────────
 SHEET_URL = "https://docs.google.com/spreadsheets/d/10UCc8hBuij59nzbURr5KSSNoge3dbvg45zhUIjDr2ns/edit?resourcekey=&gid=116017356#gid=116017356"
-sh = gc.open_by_url(sheet_url)
+sh = gc.open_by_url(SHEET_URL)
 worksheet = sh.get_worksheet(0)
 
 # Load DataFrame and drop empty photo rows
@@ -51,11 +47,10 @@ df = get_as_dataframe(worksheet).dropna(subset=["Photo"]).reset_index(drop=True)
 # ─── 4. Fetch Image Bytes ────────────────────────────────────────────────────
 def fetch_image_bytes(path_or_url):
     try:
-        # Handle local Drive path
+        # Skip local drive paths (not supported outside Colab)
         if path_or_url.startswith("/content/drive/"):
-            img = Image.open(path_or_url).convert("RGB")
-            buf = BytesIO(); img.save(buf, format="JPEG")
-            return buf.getvalue()
+            print("Local Colab drive path not supported in GitHub Actions.")
+            return None
 
         # Handle Google Drive share URLs
         if "open?id=" in path_or_url:
