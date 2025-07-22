@@ -37,7 +37,7 @@ gc = gspread.authorize(creds)
 drive_service = build("drive", "v3", credentials=creds)
 
 # ─── 3. Load Sheet and Detect Image Column ───────────────────────────────────
-SHEET_URL = "https://docs.google.com/spreadsheets/d/10UCc8hBuij59nzbURr5KSSNoge3dbvg45zhUIjDr2ns/edit?resourcekey=&gid=116017356#gid=116017356"
+SHEET_URL = "https://docs.google.com/spreadsheets/d/1-kQUNeRJ4Pz2VY83oHSHXw1aOwJ85UySGzX_JvQqxds/edit?gid=753113799#gid=753113799"
 sh = gc.open_by_url(SHEET_URL)
 worksheet = sh.get_worksheet(0)
 
