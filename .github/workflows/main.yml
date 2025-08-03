@@ -2,7 +2,7 @@ name: Run Nail Review Script
 
 on:
   schedule:
-    - cron: '0 * * * *'   #  Runs every hour
+    # - cron: '0 * * * *'   #  Runs every hour
   workflow_dispatch:       #  Manual trigger 
 
 jobs:
